@@ -100,8 +100,10 @@ async function update() {
 
     // We should mute. But lets check if user has disabled notifications on their own.
 
+    // Do we actually need this?
     // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
     // const userAlreadyMuted = await doNotDisturb.isEnabled();
+    // const userAlreadyMuted = (await exec(`${__dirname}/../get-dnd-status.sh`) === 'true');
     // if (userAlreadyMuted) {
     //   // Nothing else needs to be done
     //   return;
