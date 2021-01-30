@@ -2,7 +2,7 @@
 
 Automatically trigger "Do Not Disturb" mode while Zoom call is active. If you yourself enter do-not-disturb-mode, it should not interfere.
 
-So far only works on XFCE linux.
+So far only works on macOS Big Sur 11.1.
 
 ### Setup
 

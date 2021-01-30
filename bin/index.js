@@ -2,6 +2,11 @@
 
 const childProcess = require('child_process');
 
+// Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
+// const doNotDisturb = require('do-not-disturb');
+
+const displayNotification = require('display-notification');
+
 /**
  * This will be true if we have muted notifications. It means we have to unmute them at some point.
  */
@@ -31,75 +36,87 @@ function onFatalError(err) {
 
 async function exec(cmd) {
   return new Promise((resolve, reject) => {
-    childProcess.exec(cmd, {
-      encoding: 'utf8'
-    }, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-      } else {
-        if (stderr) {
-          console.warn(stderr);
+    childProcess.exec(
+      cmd,
+      {
+        encoding: 'utf8',
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(error);
+        } else {
+          if (stderr) {
+            console.warn(stderr);
+          }
+          resolve(stdout);
         }
-        resolve(stdout);
-      }
-    });
+      },
+    );
   });
 }
 
 async function wait(delay) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     waitId = setTimeout(resolve, delay);
   });
 }
 
-async function getDoNotDisturbState() {
-  const result = await exec('xfconf-query -c xfce4-notifyd -p /do-not-disturb');
-  return result.toLowerCase() === 'true';
-}
-
-async function setDoNotDisturbState(value) {
-  const result = await exec('xfconf-query -c xfce4-notifyd -p /do-not-disturb -s ' + (!!value));
-}
-
 async function isZoomMeetingOn() {
-  const out = await exec('xwininfo -root -tree');
-  const isZoomMeetingOn = /^\s+0x\S+\s+"Zoom Meeting"/m.test(out);
-  return isZoomMeetingOn;
-}
-
-async function showNotification(title, message, duration = 10000) {
-  await exec(`notify-send -t ${duration} "${title.replace(/"/g, '\\"')}" "${message.replace(/"/g, '\\"')}"`);
+  try {
+    await exec(
+      'ps aux | grep zoom.us.app/Contents/Frameworks/cpthost.app/Contents/MacOS/CptHost | grep -v grep',
+    );
+  } catch (err) {
+    return false;
+  }
+  return true;
 }
 
 async function update() {
   process.stdout.write('.');
 
   const shouldBeMuted = await isZoomMeetingOn();
-  
+
   if (!shouldBeMuted && muted) {
     // Unmute
-    await setDoNotDisturbState(false);
-    await showNotification('Notifications unmuted', 'Do-not-disturb mode deactivated, you will receive notifications again.');
+    await exec(`./disable-dnd.sh`);
+    // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
+    // await doNotDisturb.disable();
+    await displayNotification({
+      title: 'Notifications unmuted',
+      text:
+        'Do-not-disturb mode deactivated, you will receive notifications again.',
+    });
     muted = false;
     console.log('\nUnmuted notifications');
     return;
   }
-  
+
   if (shouldBeMuted && !muted) {
+    await displayNotification({
+      title: 'Notifications muted',
+      text: 'Do-not-disturb mode activated during your Zoom call.',
+    });
+
     // We should mute. But lets check if user has disabled notifications on their own.
-    const userAlreadyMuted = await getDoNotDisturbState();
-    if (userAlreadyMuted) {
-      // Nothing else needs to be done
-      return;
-    }
-    
+
+    // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
+    // const userAlreadyMuted = await doNotDisturb.isEnabled();
+    // if (userAlreadyMuted) {
+    //   // Nothing else needs to be done
+    //   return;
+    // }
+
     muted = true;
-    await setDoNotDisturbState(true);
-    await showNotification('Notifications muted', 'Do-not-disturb mode activated during your Zoom call.');
+    await exec(`./enable-dnd.sh`);
+
+    // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
+    // await doNotDisturb.enable();
+
     console.log('\nMuted notifications');
     return;
   }
-  
+
   // Nothing else needs to be done
 }
 
@@ -107,8 +124,7 @@ async function updateLoop() {
   while (!stopSignal) {
     try {
       await update();
-    }
-    catch (err) {
+    } catch (err) {
       console.error(`Update failed: ${err.message || err}`);
       console.error(err.stack);
     }
@@ -122,7 +138,9 @@ async function updateLoop() {
 
 async function cleanExit() {
   if (muted) {
-    await setDoNotDisturbState(false);
+    await exec(`./disable-dnd.sh`);
+    // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
+    // await doNotDisturb.disable();
   }
   process.exit(0);
 }

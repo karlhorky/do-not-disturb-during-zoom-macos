@@ -1,22 +1,19 @@
 {
-	"name": "do-not-disturb-during-zoom",
-	"version": "0.3.0",
-	"description": "Enable do-not-disturb during zoom meetings",
-	"main": "./bin/index.js",
-	"scripts": {
-		"start": "node ./bin/index.js"
-	},
-	"bin": {
-		"do-not-disturb-during-zoom": "./bin/index.js"
-	},
-	"devDependencies": {
-		"prettier": "latest"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:panta82/do-not-disturb-during-zoom.git"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT"
+  "name": "do-not-disturb-during-zoom-macos",
+  "version": "1.0.0",
+  "description": "Enable do-not-disturb during Zoom meetings on macOS",
+  "main": "./bin/index.js",
+  "bin": {
+    "do-not-disturb-during-zoom": "./bin/index.js"
+  },
+  "repository": "karlhorky/do-not-disturb-during-zoom-macos",
+  "author": "Karl Horky",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "latest"
+  },
+  "dependencies": {
+    "display-notification": "^2.0.0",
+    "do-not-disturb": "^1.2.0"
+  }
 }
