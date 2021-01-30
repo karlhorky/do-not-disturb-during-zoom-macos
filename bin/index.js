@@ -79,7 +79,7 @@ async function update() {
 
   if (!shouldBeMuted && muted) {
     // Unmute
-    await exec(`./disable-dnd.sh`);
+    await exec(`${__dirname}/../disable-dnd.sh`);
     // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
     // await doNotDisturb.disable();
     await displayNotification({
@@ -108,7 +108,7 @@ async function update() {
     // }
 
     muted = true;
-    await exec(`./enable-dnd.sh`);
+    await exec(`${__dirname}/../enable-dnd.sh`);
 
     // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
     // await doNotDisturb.enable();
@@ -138,7 +138,7 @@ async function updateLoop() {
 
 async function cleanExit() {
   if (muted) {
-    await exec(`./disable-dnd.sh`);
+    await exec(`${__dirname}/../disable-dnd.sh`);
     // Disabled until this issue is resolved: https://github.com/sindresorhus/do-not-disturb/issues/9
     // await doNotDisturb.disable();
   }
