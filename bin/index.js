@@ -64,7 +64,7 @@ async function wait(delay) {
 async function isZoomMeetingOn() {
   try {
     await exec(
-      'pgrep zoom.us.app/Contents/Frameworks/cpthost.app/Contents/MacOS/CptHost',
+      'ps aux | grep zoom.us.app/Contents/Frameworks/cpthost.app/Contents/MacOS/CptHost | grep -v grep',
     );
   } catch (err) {
     return false;
