@@ -2,13 +2,16 @@
   "name": "do-not-disturb-during-zoom-macos",
   "version": "1.0.0",
   "description": "Enable do-not-disturb during Zoom meetings on macOS",
+  "author": "Karl Horky",
+  "license": "MIT",
+  "repository": "karlhorky/do-not-disturb-during-zoom-macos",
   "main": "./bin/index.js",
   "bin": {
     "do-not-disturb-during-zoom": "./bin/index.js"
   },
-  "repository": "karlhorky/do-not-disturb-during-zoom-macos",
-  "author": "Karl Horky",
-  "license": "MIT",
+  "scripts": {
+    "start": "until node bin/index.js; do sleep 1; done"
+  },
   "devDependencies": {
     "prettier": "latest"
   },
