@@ -10,7 +10,7 @@ const displayNotification = require('display-notification');
 /**
  * This will be true if we have muted notifications. It means we have to unmute them at some point.
  */
-let muted = false;
+let muted;
 
 /**
  * ID of the wait timeout, so we can interrupt.
@@ -123,6 +123,7 @@ async function update() {
 }
 
 async function updateLoop() {
+  muted = (await exec(`${__dirname}/../get-dnd-status.sh`)) === 'true';
   while (!stopSignal) {
     try {
       await update();
